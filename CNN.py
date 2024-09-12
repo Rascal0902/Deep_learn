@@ -15,8 +15,8 @@ batch_size = 100
 learning_rate = 0.0002
 num_epoch = 10
 
-mnist_train = datasets.MNIST(root="../Data/", train=True, transform=transforms.ToTensor(), target_transform=None, download=True)
-mnist_test = datasets.MNIST(root="../Data/", train=False, transform=transforms.ToTensor(), target_transform=None, download=True)
+mnist_train = datasets.MNIST(root="../Deep_learn/Data/", train=True, transform=transforms.ToTensor(), target_transform=None, download=True)
+mnist_test = datasets.MNIST(root="../Deep_learn/Data/", train=False, transform=transforms.ToTensor(), target_transform=None, download=True)
 
 train_loader = DataLoader(mnist_train, batch_size=batch_size, shuffle=True, num_workers=0, drop_last=True)
 test_loader = DataLoader(mnist_test, batch_size=batch_size, shuffle=False, num_workers=0, drop_last=True)
@@ -63,6 +63,25 @@ class CNN(nn.Module):
         # self.fc_layer 정의한 연산 수행
         out = self.fc_layer(out)
         return out
+    
+def save_checkpoint(model, optimizer, epoch, loss, filename='checkpoint.pth'):
+    checkpoint = {
+        'epoch': epoch,
+        'model_state_dict': model.state_dict(),
+        'optimizer_state_dict': optimizer.state_dict(),
+        'loss': loss
+    }
+    torch.save(checkpoint, filename)
+    print(f'Checkpoint saved to {filename}')
+
+def load_checkpoint(model, optimizer, filename='checkpoint.pth'):
+    checkpoint = torch.load(filename)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+    start_epoch = checkpoint['epoch']
+    loss = checkpoint['loss']
+    print(f'Checkpoint loaded from {filename}')
+    return start_epoch, loss
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = CNN().to(device)
