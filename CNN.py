@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 import torch.nn.init as init
+import argparse
 
 import torchvision.datasets as datasets
 import torchvision.transforms as transforms
@@ -10,6 +11,9 @@ from torch.utils.data import DataLoader
 
 import numpy as np
 import matplotlib.pyplot as plt
+
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
 
 batch_size = 100
 learning_rate = 0.0002
@@ -83,15 +87,25 @@ def load_checkpoint(model, optimizer, filename='checkpoint.pth'):
     print(f'Checkpoint loaded from {filename}')
     return start_epoch, loss
 
+parser = argparse.ArgumentParser(description='PyTorch MNIST Training')
+parser.add_argument('--resume', type=str, default=None, help='path to checkpoint to resume training')
+args = parser.parse_args()
+
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = CNN().to(device)
 
-loss_func = nn.CrossEntropyLoss()
-
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+scheduler = optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.1)
+
+start_epoch = 0
+if args.resume:
+    start_epoch, _ = load_checkpoint(model, optimizer, args.resume)
+
 
 loss_arr = []
-for i in range(num_epoch):
+loss_func = nn.CrossEntropyLoss()
+
+for epoch in range(start_epoch, num_epoch):
     for j, [image, label] in enumerate(train_loader):
         x = image.to(device)
         y = label.to(device)
@@ -105,11 +119,13 @@ for i in range(num_epoch):
         optimizer.step()
 
         if j % 1000 == 0:
-            print("loss",loss)
+            print(f"Epoch [{epoch+1}/{num_epoch}], Step [{j}/{len(train_loader)}], Loss: {loss.item()}")
             loss_arr.append(loss.cpu().detach().numpy())
 
 correct = 0
 total = 0
+y_true = []
+y_pred = []
 
 # evaluate model
 model.eval()
@@ -129,6 +145,18 @@ with torch.no_grad():
 
         # 도출한 모델의 index와 라벨이 일치하면 correct에 개수 추가
         correct += (output_index == y).sum().float()
+        
+        y_true.extend(y.cpu().numpy())
+        y_pred.extend(output_index.cpu().numpy())
 
     # 정확도 도출
     print("Accuracy of Test Data: {}%".format(100 * correct / total))
+    
+# 혼동 행렬 시각화
+cm = confusion_matrix(y_true, y_pred)
+plt.figure(figsize=(10, 7))
+sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=range(10), yticklabels=range(10))
+plt.xlabel('Predicted')
+plt.ylabel('True')
+plt.title('Confusion Matrix')
+plt.show()
