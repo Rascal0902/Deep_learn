@@ -1,0 +1,26 @@
+AUGMENTATION:
+  ENABLED: false
+DATA:
+  BATCH_SIZE: 100
+  NUM_WORKERS: 4
+EXP_NAME: mnist_cnn_experiment
+LOGGING:
+  LOG_DIR: ./logs
+  TENSORBOARD: true
+MODEL:
+  CONV_LAYERS: 3
+  INPUT_CHANNELS: 1
+  OUTPUT_CLASSES: 10
+OPTIMIZER:
+  LEARNING_RATE: 0.0002
+  TYPE: Adam
+  WEIGHT_DECAY: 0.0001
+SEED_VALUE: 42
+TRAINING:
+  CHECK_VAL_EVERY_N_EPOCH: 1
+  MAX_EPOCHS: 10
+  RESUME: null
+batch_size: 100
+learning_rate: 0.0002
+log_dir: ./logs
+num_epoch: 10

@@ -1,0 +1,35 @@
+# 기본 설정
+EXP_NAME: "mnist_cnn_experiment"  # 실험 이름
+SEED_VALUE: 42  # 랜덤 시드 값
+
+TRAINING:
+  MAX_EPOCHS: 10  # 최대 에폭 수
+  CHECK_VAL_EVERY_N_EPOCH: 1  # 검증 주기
+  RESUME: null  # 체크포인트 재개 경로
+
+OPTIMIZER:
+  TYPE: "Adam"  # 최적화 알고리즘
+  LEARNING_RATE: 0.0002  # 학습률
+  WEIGHT_DECAY: 0.0001  # 가중치 감쇠
+
+MODEL:
+  INPUT_CHANNELS: 1  # 입력 채널 수 (예: 1 for 흑백 이미지)
+  OUTPUT_CLASSES: 10  # 출력 클래스 수 (예: MNIST의 10)
+  CONV_LAYERS: 3  # 컨볼루션 레이어 수
+
+LOGGING:
+  LOG_DIR: "./logs"  # 로그 저장 디렉터리
+  TENSORBOARD: true  # TensorBoard 사용 여부
+
+DATA:
+  BATCH_SIZE: 100  # 배치 크기
+  NUM_WORKERS: 4  # 데이터 로딩에 사용할 워커 수
+
+AUGMENTATION:
+  ENABLED: false  # 데이터 증강 사용 여부
+
+# 추가적인 하이퍼파라미터
+batch_size: 100
+learning_rate: 0.0002
+num_epoch: 10
+log_dir: "./logs"
